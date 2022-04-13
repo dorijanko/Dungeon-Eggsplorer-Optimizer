@@ -38,11 +38,13 @@ For each row, you write something like this [number of columns] times:
 
 [2-letter code][quantity, an integer]
 
-11 of the 2-letter codes are explained above, but there are 6 others:
+11 of the 2-letter codes are explained above, but there are 7 others:
 
 ST means start; quantity doesn't matter
 
 ED means end; quantity doesn't matter
+
+XX means inaccessible; quantity doesn't matter
 
 SK means silver key; quantities other than 1 are not supported
 
