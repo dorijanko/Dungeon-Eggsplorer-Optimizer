@@ -1,0 +1,12 @@
+80 total torches
+DI(diamonds): 1
+PL(pet levels): 30
+SP(skill points): 100
+DU(dust): 1.6
+SH(shards): 30
+EA(event avatar): 0.1
+CE(common equipment): 1
+EE(event equipment): 1
+LE(legendary equipment): 25
+PK(perk): 0.01
+FS(firestones): 10
