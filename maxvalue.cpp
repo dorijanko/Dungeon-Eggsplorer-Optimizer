@@ -401,8 +401,8 @@ int main()
 	dung>>floorCount;
 	array<array<vector<pair<vector<vector<pii>>,ld>>,100>,100> curState;
 	curState[50][50]={{{},0}};
-	vector<vector<pii>> optpoi;
-	ld optval=-INF*20000;
+	vector<vector<vector<pii>>> optpoi;
+	vector<ld> optval;
 	vector<pii> dim,sta;
 	for (int floor=1;floor<=floorCount;++floor)
 	{
@@ -437,10 +437,14 @@ int main()
 		clog<<"Got results if dungeon "<<floor<<" is the end."<<endl;
 		auto totalEnd=addFloor(curState,resEnd);
 		clog<<"Merged results if dungeon "<<floor<<" is the end."<<endl;
-		for (int cgk=50;cgk<100;++cgk) for (int csk=50;csk<100;++csk) for (int toru=0;toru<=min(torchCount,(int)totalEnd[cgk][csk].size()-1);++toru) if (totalEnd[cgk][csk][toru].y>optval)
+		for (int cgk=50;cgk<100;++cgk) for (int csk=50;csk<100;++csk)
 		{
-			optval=totalEnd[cgk][csk][toru].y;
-			optpoi=totalEnd[cgk][csk][toru].x;
+			while (optpoi.size()<totalEnd[cgk][csk].size()) optpoi.push_back({}),optval.push_back(-INF*20000);
+			for (int toru=0;toru<(int)totalEnd[cgk][csk].size();++toru) if (totalEnd[cgk][csk][toru].y>optval[toru])
+			{
+				optval[toru]=totalEnd[cgk][csk][toru].y;
+				optpoi[toru]=totalEnd[cgk][csk][toru].x;
+			}
 		}
 		if (floor<floorCount)
 		{
@@ -454,14 +458,14 @@ int main()
 		sta.push_back(start);
 	}
 	ofstream result("result.txt");
-	result<<"The highest obtainable value is "<<fixed<<setprecision(5)<<optval<<endl;
-	result<<"You should explore "<<optpoi.size()<<" floors."<<endl;
+	result<<"The highest obtainable value is "<<fixed<<setprecision(5)<<optval[torchCount]<<endl;
+	result<<"You should explore "<<optpoi[torchCount].size()<<" floors."<<endl;
 	result<<"Here are the cells you should unlock on each floor(S=start, 1=unlock, 0=don't unlock):"<<endl;
-	for (int f=0;f<(int)optpoi.size();++f)
+	for (int f=0;f<(int)optpoi[torchCount].size();++f)
 	{
 		int n=dim[f].x,m=dim[f].y;
 		vector<vector<int>> re(n,vector<int>(m));
-		for (auto x: optpoi[f]) ++re[x.x][x.y];
+		for (auto x: optpoi[torchCount][f]) ++re[x.x][x.y];
 		for (int i=0;i<n;++i,result<<endl) for (int j=0;j<m;++j)
 		{
 			if (sta[f]==make_pair(i,j))
@@ -473,8 +477,36 @@ int main()
 		}
 		result<<endl;
 	}
+	ld maxnet=optval[torchCount];
+	int howmaxnet=torchCount;
+	for (int i=torchCount;i<(int)optval.size();++i) if (optval[i]-(i-torchCount)*30*values["DI"]>maxnet)
+	{
+		howmaxnet=i;
+		maxnet=optval[i]-(i-torchCount)*30*values["DI"];
+	}
+	if (howmaxnet!=torchCount)
+	{
+		result<<"You can also buy "<<howmaxnet-torchCount<<" pet levels to get a value that's "<<optval[howmaxnet]-optval[torchCount]<<" higher, while only losing an equivalent of "<<(howmaxnet-torchCount)*30*values["DI"]<<" value on buying pets."<<endl;
+		result<<"You should explore "<<optpoi[howmaxnet].size()<<" floors."<<endl;
+		result<<"Here are the cells you should unlock on each floor(S=start, 1=unlock, 0=don't unlock):"<<endl;
+		for (int f=0;f<(int)optpoi[howmaxnet].size();++f)
+		{
+			int n=dim[f].x,m=dim[f].y;
+			vector<vector<int>> re(n,vector<int>(m));
+			for (auto x: optpoi[howmaxnet][f]) ++re[x.x][x.y];
+			for (int i=0;i<n;++i,result<<endl) for (int j=0;j<m;++j)
+			{
+				if (sta[f]==make_pair(i,j))
+				{
+					if (re[i][j]!=1) exit(69420);
+					result<<'S';
+				}
+				else result<<re[i][j];
+			}
+			result<<endl;
+		}
+	}
 }
-
 
 
 
