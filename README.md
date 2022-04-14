@@ -55,3 +55,5 @@ SL means silver lock; quantities other than 1 are not supported
 GL means gold lock; quantities other than 1 are not supported
 
 After running the program, it will write the result in result.txt. An example of dungeon.txt and resourceValues.txt, as well as what result.txt should look like after running the program with the example dungeon.txt and resourceValues.txt files is given.
+
+If you already spent some torches and want to optimize spending the rest, you can do that by setting the tiles that you opened in the dungeon as something like 1000 diamonds to force the optimizer to get them.
