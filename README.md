@@ -4,7 +4,7 @@ This program maximizes your gains in the Dungeon Eggsplorer event. It needs to k
   
 DI(diamonds): [numerical value of diamonds]
   
-PL(pet levels): [numerical value of pet levels]
+PL(pet levels; don't include the fact that they give torches into the value): [numerical value of pet levels]
   
 SP(skill points): [numerical value of skill points]
   
