@@ -380,7 +380,7 @@ int main()
 	player>>torchCount;
 	string filler;
 	player>>filler>>filler;
-	const int REC=11;
+	const int REC=13;
 	map<string,ld> values;
 	for (int i=0;i<REC;++i)
 	{
