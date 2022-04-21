@@ -7,6 +7,8 @@ DI(diamonds): [numerical value of diamonds]
 PL(pet levels; don't include the fact that they give torches into the value): [numerical value of pet levels]
   
 SP(skill points): [numerical value of skill points]
+
+SR(skill tree reset token): [numerical value of skill tree reset tokens]
   
 DU(dust): [numerical value of dust]
   
@@ -15,6 +17,8 @@ SH(shards): [numerical value of crafting shards]
 EA(event avatar): [numerical value of the event avatar]
   
 CE(common equipment): [numerical value of common equipment]
+
+RE(rare equipment): [numerical value of rare equipment]
   
 EE(event equipment): [numerical value of event equipment]
   
