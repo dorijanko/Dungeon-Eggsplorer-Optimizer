@@ -2,10 +2,12 @@
 DI(diamonds): 1
 PL(pet levels; don't include the fact that they give torches into the value): 15
 SP(skill points): 100
+SR(skill tree reset token): 0.001
 DU(dust): 1.6
 SH(shards): 30
 EA(event avatar): 0.1
 CE(common equipment): 1
+RE(rare equipment): 5
 EE(event equipment): 1
 LE(legendary equipment): 25
 PK(perk): 0.01
