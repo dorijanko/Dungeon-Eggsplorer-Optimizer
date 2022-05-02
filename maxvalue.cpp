@@ -220,12 +220,12 @@ void genRandTest(int n,int m,int k,int l) //just for testing
 	totcor+=valann/valopt;
 }
 
-const int MAXGK=15,MAXSK=25,MAXRGK=1,MAXRSK=4;
+const int MAXGK=15,MAXSK=25,MAXRGK=0,MAXRSK=2;
 using muldesc=array<array<array<array<vector<pair<vector<vector<pii>>,ld>>,MAXSK>,MAXSK>,MAXGK>,MAXGK>;
 using floordesc=array<array<array<array<vector<pair<vector<pii>,ld>>,MAXSK>,MAXSK>,MAXGK>,MAXGK>;
 int curFloorForDebug;
 
-pair<muldesc,array<int,4>> addFloor(muldesc prev,floordesc newf,array<int,4> dim1,array<int,4> dim2,array<int,2> req)
+pair<muldesc,array<int,4>> addFloor(const muldesc&prev,const floordesc&newf,array<int,4> dim1,array<int,4> dim2,array<int,2> req)
 {
 	muldesc res;
 	for (int gk1=0;gk1<dim1[0];++gk1) for (int gk2=max(0,req[0]-gk1);gk2<dim2[0];++gk2)
@@ -473,19 +473,21 @@ int main()
 		clog<<sce<<" possible scenarios completed."<<endl;
 		clog<<"Got results if dungeon "<<floor<<" is the end in "<<diff.count()<<" seconds."<<endl;
 		startTime=chrono::high_resolution_clock::now();
-		auto totalEndEv=addFloor(curState,resEnd,dimens,dimcufl1,{0,0});
-		diff=chrono::high_resolution_clock::now()-startTime;
-		muldesc totalEnd=totalEndEv.x;
-		array<int,4> dimifexno=totalEndEv.y;
-		clog<<"Merged results if dungeon "<<floor<<" is the end in "<<diff.count()<<" seconds."<<endl;
-		for (int cgk=0;cgk<dimifexno[0];++cgk) for (int cgl=0;cgl<dimifexno[1];++cgl) for (int csk=0;csk<dimifexno[2];++csk) for (int csl=0;csl<dimifexno[3];++csl)
 		{
-			if (cgl>cgk || csl>csk) continue;
-			while (optpoi.size()<totalEnd[cgk][cgl][csk][csl].size()) optpoi.push_back({}),optval.push_back(-INF*20000);
-			for (int toru=0;toru<(int)totalEnd[cgk][cgl][csk][csl].size();++toru) if (totalEnd[cgk][cgl][csk][csl][toru].y>optval[toru])
+			auto totalEndEv=addFloor(curState,resEnd,dimens,dimcufl1,{0,0});
+			diff=chrono::high_resolution_clock::now()-startTime;
+			const muldesc&totalEnd=totalEndEv.x;
+			array<int,4> dimifexno=totalEndEv.y;
+			clog<<"Merged results if dungeon "<<floor<<" is the end in "<<diff.count()<<" seconds."<<endl;
+			for (int cgk=0;cgk<dimifexno[0];++cgk) for (int cgl=0;cgl<dimifexno[1];++cgl) for (int csk=0;csk<dimifexno[2];++csk) for (int csl=0;csl<dimifexno[3];++csl)
 			{
-				optval[toru]=totalEnd[cgk][cgl][csk][csl][toru].y;
-				optpoi[toru]=totalEnd[cgk][cgl][csk][csl][toru].x;
+				if (cgl>cgk || csl>csk) continue;
+				while (optpoi.size()<totalEnd[cgk][cgl][csk][csl].size()) optpoi.push_back({}),optval.push_back(-INF*20000);
+				for (int toru=0;toru<(int)totalEnd[cgk][cgl][csk][csl].size();++toru) if (totalEnd[cgk][cgl][csk][csl][toru].y>optval[toru])
+				{
+					optval[toru]=totalEnd[cgk][cgl][csk][csl][toru].y;
+					optpoi[toru]=totalEnd[cgk][cgl][csk][csl][toru].x;
+				}
 			}
 		}
 		if (floor<floorCount)
