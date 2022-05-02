@@ -27,6 +27,8 @@ LE(legendary equipment): [numerical value of legendary equipment]
 PK(perk): [numerical value of perks]
   
 FS(firestones): [numerical value of firestones]
+
+FW(fortune hero weapon): [numerical value of fortune hero weapons]
   
 I don't recommend setting any of the values above 1000000 or between 0 and 0.00001. The program will try to maximize the total value of resources you get on the path; for example, if you set the value of diamonds as 10 and the value of dust as 16 and you get 200 diamonds and 300 dust, the total value will be 2000+4800=6800.
 
