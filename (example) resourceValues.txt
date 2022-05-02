@@ -12,3 +12,4 @@ EE(event equipment): 1
 LE(legendary equipment): 25
 PK(perk): 0.01
 FS(firestones): 10
+FW(fortune hero weapon): 100
