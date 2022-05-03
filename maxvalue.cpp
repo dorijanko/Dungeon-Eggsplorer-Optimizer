@@ -147,7 +147,7 @@ vector<pii> anneal(vector<vector<ld>> val,int torchc,pii start,vector<vector<int
 			maxval=newval;
 			maxpoi=poi;
 		}
-		const ld EX=1,DIV=1; //higher EX=more sudden change from exploring to not exploring(in general more exploring), higher DIV=less exploring
+		const ld EX=1,DIV=6; //higher EX=more sudden change from exploring to not exploring(in general more exploring), higher DIV=less exploring
 		ld T=med*pow(ITERCOUNT/(curit+1),EX)/DIV;
 		if (newval<prevval-INF/2 || (newval<prevval && exp((newval-prevval)/T)<dis(rng))) poi=prevpoi;
 	}
