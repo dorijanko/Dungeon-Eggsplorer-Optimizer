@@ -93,6 +93,46 @@ bool addran(vector<pii>&poi,int n,int m,vector<vector<int>> allo,vector<pii> avo
 	return 0;
 }
 
+ld gettotval(vector<pii> poi,vector<vector<ld>> val)
+{
+	ld res=0;
+	for (auto x: poi) res+=val[x.x][x.y];
+	return res;
+}
+
+vector<pii> addall(vector<pii> poi,int n,int m,vector<vector<int>> allo,vector<vector<ld>> val)
+{
+	vector<vector<int>> dob(n,vector<int>(m));
+	for (auto x: poi) for (int k=0;k<4;++k)
+	{
+		int x1=x.x+dx[k],y1=x.y+dy[k];
+		if (x1<0 || y1<0 || x1>=n || y1>=m) continue;
+		if (!allo[x1][y1]) continue;
+		//cout<<x.x<<' '<<x.y<<' '<<x1<<' '<<y1<<endl;
+		dob[x1][y1]=1;
+	}
+	for (auto x: poi) dob[x.x][x.y]=0;
+	int kol=0;
+	for (int i=0;i<n;++i) for (int j=0;j<m;++j) kol+=dob[i][j];
+	vector<pii> maxv;
+	for (int whi=1;whi<=kol;++whi)
+	{
+		kol=0;
+		for (int i=0;i<n;++i) for (int j=0;j<m;++j) if (dob[i][j])
+		{
+			++kol;
+			if (kol==whi)
+			{
+				auto poi1=poi;
+				poi1.push_back({i,j});
+				sort(poi1.begin(),poi1.end());
+				if (connected(poi1) && gettotval(poi1,val)>gettotval(maxv,val)) maxv=poi1;
+			}
+		}
+	}
+	return maxv;
+}
+
 bool repran(vector<pii>&poi,int n,int m,vector<vector<int>> allo,pii start)
 {
 	vector<int> ordtry;
@@ -111,13 +151,6 @@ bool repran(vector<pii>&poi,int n,int m,vector<vector<int>> allo,pii start)
 		}
 	}
 	return 0;
-}
-
-ld gettotval(vector<pii> poi,vector<vector<ld>> val)
-{
-	ld res=0;
-	for (auto x: poi) res+=val[x.x][x.y];
-	return res;
 }
 
 vector<pii> anneal(vector<vector<ld>> val,int torchc,pii start,vector<vector<int>> allo)
@@ -386,11 +419,11 @@ pair<floordesc,array<int,4>> getRes(vector<vector<ld>> val,vector<vector<int>> a
 					++sce;
 					sre.push_back(anneal(newval,torchc,start,newallo));
 				}
-				for (int torchc=maxtorchc-1;torchc>=gapl;--torchc)
+				for (int z=0;z<5;++z)
 				{
-					vector<pii> re=sre[torchc];
-					if (torchc>gapl)
+					for (int torchc=maxtorchc-1;torchc>gapl;--torchc)
 					{
+						vector<pii> re=sre[torchc];
 						for (int i=0;i<(int)re.size();++i) if (re[i]!=start)
 						{
 							vector<pii> re1=re;
@@ -398,6 +431,16 @@ pair<floordesc,array<int,4>> getRes(vector<vector<ld>> val,vector<vector<int>> a
 							if (connected(re1) && gettotval(re1,newval)>gettotval(sre[torchc-1],newval)) sre[torchc-1]=re1;
 						}
 					}
+					for (int torchc=gapl;torchc<maxtorchc-1;++torchc)
+					{
+						vector<pii> re=sre[torchc];
+						vector<pii> re1=addall(re,n,m,newallo,newval);
+						if (gettotval(re1,newval)>gettotval(sre[torchc+1],newval)) sre[torchc+1]=re1;
+					}
+				}
+				for (int torchc=gapl;torchc<maxtorchc;++torchc)
+				{
+					vector<pii> re=sre[torchc];
 					int nettorchc=torchc-gapl;
 					ld nv=gettotval(re,newval)-offset;
 					if (nv<0) continue;
