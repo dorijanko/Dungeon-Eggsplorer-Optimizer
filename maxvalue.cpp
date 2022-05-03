@@ -132,7 +132,7 @@ vector<pii> anneal(vector<vector<ld>> val,int torchc,pii start,vector<vector<int
 	ld med;
 	if (formed.empty()) med=1;
 	else med=formed[formed.size()/2];
-	const int ITERCOUNT=1e2;
+	const int ITERCOUNT=5e3;
 	uniform_real_distribution<ld> dis(0,1);
 	ld maxval=gettotval(poi,val);
 	vector<pii> maxpoi=poi;
