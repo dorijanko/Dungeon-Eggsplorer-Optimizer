@@ -313,77 +313,92 @@ pair<floordesc,array<int,4>> getRes(vector<vector<ld>> val,vector<vector<int>> a
 	int maxtorchc=0,n=val.size(),m=val[0].size();
 	for (int i=0;i<n;++i) for (int j=0;j<m;++j) maxtorchc+=allo[i][j];
 	floordesc res;
-	for (int torchc=0;torchc<maxtorchc;++torchc)
+	for (int maskPL=0;maskPL<(1<<pl.size());++maskPL)
 	{
-		for (int maskPL=0;maskPL<(1<<pl.size());++maskPL)
+		for (int maskGK=0;maskGK<(1<<gk.size());++maskGK) for (int maskGL=0;maskGL<(1<<gl.size());++maskGL)
 		{
-			for (int maskGK=0;maskGK<(1<<gk.size());++maskGK) for (int maskGL=0;maskGL<(1<<gl.size());++maskGL)
+			for (int maskSK=0;maskSK<(1<<sk.size());++maskSK) for (int maskSL=0;maskSL<(1<<sl.size());++maskSL)
 			{
-				for (int maskSK=0;maskSK<(1<<sk.size());++maskSK) for (int maskSL=0;maskSL<(1<<sl.size());++maskSL)
+				vector<vector<ld>> newval=val;
+				vector<vector<int>> newallo=allo;
+				ld offset=0;
+				if (reqExit)
 				{
-					vector<vector<ld>> newval=val;
-					vector<vector<int>> newallo=allo;
-					ld offset=0;
-					if (reqExit)
+					newval[exitp.x][exitp.y]+=INF;
+					offset+=INF;
+				}
+				int gapl=0;
+				for (int i=0;i<(int)pl.size();++i)
+				{
+					if ((maskPL>>i)&1)
 					{
-						newval[exitp.x][exitp.y]+=INF;
+						newval[pl[i].x.x][pl[i].x.y]+=INF;
 						offset+=INF;
+						gapl+=pl[i].y;
 					}
-					int nettorchc=torchc;
-					for (int i=0;i<(int)pl.size();++i)
+					else newallo[pl[i].x.x][pl[i].x.y]=0;
+				}
+				int gkc=0,glc=0,skc=0,slc=0;
+				for (int i=0;i<(int)gk.size();++i)
+				{
+					if ((maskGK>>i)&1)
 					{
-						if ((maskPL>>i)&1)
-						{
-							newval[pl[i].x.x][pl[i].x.y]+=INF;
-							offset+=INF;
-							nettorchc-=pl[i].y;
-						}
-						else newallo[pl[i].x.x][pl[i].x.y]=0;
+						newval[gk[i].x][gk[i].y]+=INF;
+						offset+=INF;
+						gkc++;
 					}
-					if (nettorchc<0) continue;
-					int gkc=0,glc=0,skc=0,slc=0;
-					for (int i=0;i<(int)gk.size();++i)
+					else newallo[gk[i].x][gk[i].y]=0;
+				}
+				for (int i=0;i<(int)gl.size();++i)
+				{
+					if ((maskGL>>i)&1)
 					{
-						if ((maskGK>>i)&1)
-						{
-							newval[gk[i].x][gk[i].y]+=INF;
-							offset+=INF;
-							gkc++;
-						}
-						else newallo[gk[i].x][gk[i].y]=0;
+						newval[gl[i].x][gl[i].y]+=INF;
+						offset+=INF;
+						glc++;
 					}
-					for (int i=0;i<(int)gl.size();++i)
+					else newallo[gl[i].x][gl[i].y]=0;
+				}
+				for (int i=0;i<(int)sk.size();++i)
+				{
+					if ((maskSK>>i)&1)
 					{
-						if ((maskGL>>i)&1)
-						{
-							newval[gl[i].x][gl[i].y]+=INF;
-							offset+=INF;
-							glc++;
-						}
-						else newallo[gl[i].x][gl[i].y]=0;
+						newval[sk[i].x][sk[i].y]+=INF;
+						offset+=INF;
+						skc++;
 					}
-					for (int i=0;i<(int)sk.size();++i)
+					else newallo[sk[i].x][sk[i].y]=0;
+				}
+				for (int i=0;i<(int)sl.size();++i)
+				{
+					if ((maskSL>>i)&1)
 					{
-						if ((maskSK>>i)&1)
-						{
-							newval[sk[i].x][sk[i].y]+=INF;
-							offset+=INF;
-							skc++;
-						}
-						else newallo[sk[i].x][sk[i].y]=0;
+						newval[sl[i].x][sl[i].y]+=INF;
+						offset+=INF;
+						slc++;
 					}
-					for (int i=0;i<(int)sl.size();++i)
-					{
-						if ((maskSL>>i)&1)
-						{
-							newval[sl[i].x][sl[i].y]+=INF;
-							offset+=INF;
-							slc++;
-						}
-						else newallo[sl[i].x][sl[i].y]=0;
-					}
+					else newallo[sl[i].x][sl[i].y]=0;
+				}
+				vector<vector<pii>> sre;
+				for (int torchc=0;torchc<gapl;++torchc) sre.push_back({});
+				for (int torchc=gapl;torchc<maxtorchc;++torchc)
+				{
 					++sce;
-					auto re=anneal(newval,torchc,start,newallo);
+					sre.push_back(anneal(newval,torchc,start,newallo));
+				}
+				for (int torchc=maxtorchc-1;torchc>=gapl;--torchc)
+				{
+					vector<pii> re=sre[torchc];
+					if (torchc>gapl)
+					{
+						for (int i=0;i<(int)re.size();++i) if (re[i]!=start)
+						{
+							vector<pii> re1=re;
+							re1.erase(re1.begin()+i);
+							if (connected(re1) && gettotval(re1,newval)>gettotval(sre[torchc-1],newval)) sre[torchc-1]=re1;
+						}
+					}
+					int nettorchc=torchc-gapl;
 					ld nv=gettotval(re,newval)-offset;
 					if (nv<0) continue;
 					while ((int)res[gkc][glc][skc][slc].size()<=nettorchc) res[gkc][glc][skc][slc].push_back({{},-INF*10000});
