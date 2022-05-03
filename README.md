@@ -23,6 +23,8 @@ RE(rare equipment): [numerical value of rare equipment]
 EE(event equipment): [numerical value of event equipment]
   
 LE(legendary equipment): [numerical value of legendary equipment]
+
+ME(mythic equipment): [numerical value of mythic equipment]
   
 PK(perk): [numerical value of perks]
   
