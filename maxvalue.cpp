@@ -405,6 +405,49 @@ void ldi(array<int,4> dimens)
 	clog<<"Dimensions: "<<dimens[0]<<' '<<dimens[1]<<' '<<dimens[2]<<' '<<dimens[3]<<endl;
 }
 
+string inSheet(string y)
+{
+	string x=y.substr(0,2);
+	if (x=="GK") return "Gold Key";
+	if (x=="GL") return "Gold Lock";
+	if (x=="SK") return "Silver Key";
+	if (x=="SL") return "Silver Lock";
+	if (x=="ST") return "\xE2\x87\xA7";
+	if (x=="ED") return "\xE2\x87\xA9";
+	if (x=="DI")
+	{
+		if (y.substr(2)=="0") return "X";
+		return y.substr(2)+" dias";
+	}
+	if (x=="PL")
+	{
+		string temps=y.substr(2)+" pet";
+		if (y.substr(2)!="1") temps.push_back('s');
+		return temps;
+	}
+	if (x=="SP") return y.substr(2)+" SP";
+	if (x=="SR") return y.substr(2)+" SP Reset Token";
+	if (x=="DU") return y.substr(2)+" dusts";
+	if (x=="SH") return y.substr(2)+" shards";
+	if (x=="EA") return "Event Avatar";
+	if (x=="EF") return "Event Frame";
+	if (x=="CE") return "Equip";
+	if (x=="RE") return "Rare Equip";
+	if (x=="EE") return "Event Equip";
+	if (x=="LE") return "Legend Equip";
+	if (x=="ME") return "Mythic Equip";
+	if (x=="PS") return "PoS Perk";
+	if (x=="AR") return "AR Perk";
+	if (x=="MR") return "MiR Perk";
+	if (x=="MP") return "MP Perk";
+	if (x=="DO") return "Doom Perk";
+	if (x=="FS") return y.substr(2)+" FS";
+	if (x=="FW") return "Fortune Weapon";
+	if (x=="XX") return "";
+	clog<<x<<endl;
+	exit(6969);
+}
+
 int main()
 {
 	ifstream player("resourceValues.txt");
@@ -412,7 +455,7 @@ int main()
 	player>>torchCount;
 	string filler;
 	player>>filler>>filler;
-	const int REC=16;
+	const int REC=20;
 	map<string,ld> values;
 	for (int i=0;i<REC;++i)
 	{
@@ -432,21 +475,25 @@ int main()
 	int floorCount;
 	dung>>floorCount;
 	vector<array<int,4>> latkl;
+	vector<array<array<string,9>,9>> desc;
 	for (int floor=1;floor<=floorCount;++floor)
 	{
 		int n,m;
 		dung>>n>>m;
 		array<int,4> cn={0,0,0,0};
+		array<array<string,9>,9> cuu;
 		for (int i=0;i<n;++i) for (int j=0;j<m;++j)
 		{
-			string x;
-			dung>>x;
-			x=x.substr(0,2);
+			string y;
+			dung>>y;
+			string x=y.substr(0,2);
 			if (x=="GK") ++cn[0];
 			if (x=="GL") ++cn[1];
 			if (x=="SK") ++cn[2];
 			if (x=="SL") ++cn[3];
+			cuu[i][j]=inSheet(y);
 		}
+		desc.push_back(cuu);
 		latkl.push_back(cn);
 	}
 	latkl.push_back({0,0,0,0});
@@ -539,6 +586,8 @@ int main()
 	}
 	torchCount=min(torchCount,(int)optval.size()-1);
 	ofstream result("result.txt");
+	ofstream inshee("intoSheet1.txt");
+	inshee<<"\xEF\xBB\xBF";
 	result<<"The highest obtainable value is "<<fixed<<setprecision(5)<<optval[torchCount]<<endl;
 	result<<"You should explore "<<optpoi[torchCount].size()<<" floors."<<endl;
 	result<<"Here are the cells you should unlock on each floor(S=start, 1=unlock, 0=don't unlock):"<<endl;
@@ -547,16 +596,26 @@ int main()
 		int n=dim[f].x,m=dim[f].y;
 		vector<vector<int>> re(n,vector<int>(m));
 		for (auto x: optpoi[torchCount][f]) ++re[x.x][x.y];
-		for (int i=0;i<n;++i,result<<endl) for (int j=0;j<m;++j)
+		inshee<<"; ;A;B;C;D;E;F;G;H;I"<<endl;
+		for (int i=0;i<n;++i,result<<endl)
 		{
-			if (sta[f]==make_pair(i,j))
+			inshee<<i+1;
+			for (int j=0;j<m;++j)
 			{
-				if (re[i][j]!=1) exit(69420);
-				result<<'S';
+				if (sta[f]==make_pair(i,j))
+				{
+					if (re[i][j]!=1) exit(69420);
+					result<<'S';
+				}
+				else result<<re[i][j];
+				inshee<<";";
+				if (re[i][j]) inshee<<desc[f][i][j];
+				else inshee<<" ";
 			}
-			else result<<re[i][j];
+			inshee<<";"<<endl;
 		}
 		result<<endl;
+		inshee<<endl;
 	}
 	ld maxnet=optval[torchCount];
 	int howmaxnet=torchCount;
@@ -567,6 +626,8 @@ int main()
 	}
 	if (howmaxnet!=torchCount)
 	{
+		ofstream insheeA("intoSheet2.txt");
+		insheeA<<"\xEF\xBB\xBF";
 		result<<"You can also buy "<<howmaxnet-torchCount<<" pet levels to get a value that's "<<optval[howmaxnet]-optval[torchCount]<<" higher, while only losing an equivalent of "<<(howmaxnet-torchCount)*30*values["DI"]<<" value on buying pets."<<endl;
 		result<<"You should explore "<<optpoi[howmaxnet].size()<<" floors."<<endl;
 		result<<"Here are the cells you should unlock on each floor(S=start, 1=unlock, 0=don't unlock):"<<endl;
@@ -575,16 +636,26 @@ int main()
 			int n=dim[f].x,m=dim[f].y;
 			vector<vector<int>> re(n,vector<int>(m));
 			for (auto x: optpoi[howmaxnet][f]) ++re[x.x][x.y];
-			for (int i=0;i<n;++i,result<<endl) for (int j=0;j<m;++j)
+			insheeA<<"; ;A;B;C;D;E;F;G;H;I"<<endl;
+			for (int i=0;i<n;++i,result<<endl)
 			{
-				if (sta[f]==make_pair(i,j))
+				insheeA<<i+1;
+				for (int j=0;j<m;++j)
 				{
-					if (re[i][j]!=1) exit(69420);
-					result<<'S';
+					if (sta[f]==make_pair(i,j))
+					{
+						if (re[i][j]!=1) exit(69421);
+						result<<'S';
+					}
+					else result<<re[i][j];
+					insheeA<<";";
+					if (re[i][j]) insheeA<<desc[f][i][j];
+					else insheeA<<" ";
 				}
-				else result<<re[i][j];
+				insheeA<<";"<<endl;
 			}
 			result<<endl;
+			insheeA<<endl;
 		}
 	}
 	clog<<tottim<<" seconds for annealing."<<endl;
