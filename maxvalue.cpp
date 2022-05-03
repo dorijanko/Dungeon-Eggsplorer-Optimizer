@@ -132,7 +132,7 @@ vector<pii> anneal(vector<vector<ld>> val,int torchc,pii start,vector<vector<int
 	ld med;
 	if (formed.empty()) med=1;
 	else med=formed[formed.size()/2];
-	const int ITERCOUNT=5e3;
+	const int ITERCOUNT=1e2;
 	uniform_real_distribution<ld> dis(0,1);
 	ld maxval=gettotval(poi,val);
 	vector<pii> maxpoi=poi;
@@ -209,10 +209,7 @@ void genRandTest(int n,int m,int k,int l) //just for testing
 		allo[x.x][x.y]=1;
 		val[x.x][x.y]=(rand()%101)/100.;
 	}
-	ld sta=clock();
 	vector<pii> annsol=anneal(val,l-1,start,allo);
-	ld end=clock();
-	tottim+=(end-sta)/CLOCKS_PER_SEC;
 	vector<pii> optsol=optSol(val,l-1,start,allo);
 	ld valann=gettotval(annsol,val);
 	ld valopt=gettotval(optsol,val);
@@ -220,12 +217,12 @@ void genRandTest(int n,int m,int k,int l) //just for testing
 	totcor+=valann/valopt;
 }
 
-const int MAXGK=15,MAXSK=25,MAXRGK=0,MAXRSK=2;
+const int MAXGK=10,MAXSK=25,MAXRGK=0,MAXRSK=3;
 using muldesc=array<array<array<array<vector<pair<vector<vector<pii>>,ld>>,MAXSK>,MAXSK>,MAXGK>,MAXGK>;
 using floordesc=array<array<array<array<vector<pair<vector<pii>,ld>>,MAXSK>,MAXSK>,MAXGK>,MAXGK>;
 int curFloorForDebug;
 
-pair<muldesc,array<int,4>> addFloor(const muldesc&prev,const floordesc&newf,array<int,4> dim1,array<int,4> dim2,array<int,2> req)
+pair<muldesc,array<int,4>> addFloor(const muldesc&prev,const floordesc&newf,array<int,4> dim1,array<int,4> dim2,array<int,2> req,array<int,4> latkl)
 {
 	muldesc res;
 	for (int gk1=0;gk1<dim1[0];++gk1) for (int gk2=max(0,req[0]-gk1);gk2<dim2[0];++gk2)
@@ -243,6 +240,10 @@ pair<muldesc,array<int,4>> addFloor(const muldesc&prev,const floordesc&newf,arra
 					int reqs=(int)prev[gk1][gl1][sk1][sl1].size()+(int)newf[gk2][gl2][sk2][sl2].size()-1;
 					//clog<<"Expected size: "<<reqs<<' '<<prev[gk1][sl1][sk1][sl1].size()<<' '<<newf[gk2][gl2][sk2][sl2].size()<<endl;
 					int ngk=gk1+gk2-req[0],ngl=gl1+gl2-req[0],nsk=sk1+sk2-req[1],nsl=sl1+sl2-req[1];
+					if (ngk>ngl+latkl[1]) continue;
+					if (ngl>ngk+latkl[0]) continue;
+					if (nsk>nsl+latkl[3]) continue;
+					if (nsl>nsk+latkl[2]) continue;
 					if (ngk>MAXRGK && ngl>0)
 					{
 						int kol=min(ngk-MAXRGK,ngl);
@@ -411,7 +412,7 @@ int main()
 	player>>torchCount;
 	string filler;
 	player>>filler>>filler;
-	const int REC=14;
+	const int REC=16;
 	map<string,ld> values;
 	for (int i=0;i<REC;++i)
 	{
@@ -429,6 +430,29 @@ int main()
 	}
 	ifstream dung("dungeon.txt");
 	int floorCount;
+	dung>>floorCount;
+	vector<array<int,4>> latkl;
+	for (int floor=1;floor<=floorCount;++floor)
+	{
+		int n,m;
+		dung>>n>>m;
+		array<int,4> cn={0,0,0,0};
+		for (int i=0;i<n;++i) for (int j=0;j<m;++j)
+		{
+			string x;
+			dung>>x;
+			x=x.substr(0,2);
+			if (x=="GK") ++cn[0];
+			if (x=="GL") ++cn[1];
+			if (x=="SK") ++cn[2];
+			if (x=="SL") ++cn[3];
+		}
+		latkl.push_back(cn);
+	}
+	latkl.push_back({0,0,0,0});
+	for (int i=floorCount-1;i>=0;--i) for (int j=0;j<4;++j) latkl[i][j]+=latkl[i+1][j];
+	dung.close();
+	dung.open("dungeon.txt");
 	dung>>floorCount;
 	muldesc curState;
 	curState[0][0][0][0]={{{},0}};
@@ -472,9 +496,10 @@ int main()
 		array<int,4> dimcufl1=resEndEv.y;
 		clog<<sce<<" possible scenarios completed."<<endl;
 		clog<<"Got results if dungeon "<<floor<<" is the end in "<<diff.count()<<" seconds."<<endl;
+		tottim+=diff.count();
 		startTime=chrono::high_resolution_clock::now();
 		{
-			auto totalEndEv=addFloor(curState,resEnd,dimens,dimcufl1,{0,0});
+			auto totalEndEv=addFloor(curState,resEnd,dimens,dimcufl1,{0,0},{0,0,0,0});
 			diff=chrono::high_resolution_clock::now()-startTime;
 			const muldesc&totalEnd=totalEndEv.x;
 			array<int,4> dimifexno=totalEndEv.y;
@@ -502,8 +527,9 @@ int main()
 			array<int,4> dimcufl2=resNoEndEv.y;
 			clog<<sce<<" possible scenarios completed."<<endl;
 			clog<<"Got results if dungeon "<<floor<<" isn't the end in "<<diff.count()<<" seconds."<<endl;
+			tottim+=diff.count();
 			startTime=chrono::high_resolution_clock::now();
-			auto curStateEv=addFloor(curState,resNoEnd,dimens,dimcufl2,{minGK,minSK});
+			auto curStateEv=addFloor(curState,resNoEnd,dimens,dimcufl2,{minGK,minSK},latkl[floor]);
 			diff=chrono::high_resolution_clock::now()-startTime;
 			curState=curStateEv.x;
 			dimens=curStateEv.y;
@@ -561,6 +587,7 @@ int main()
 			result<<endl;
 		}
 	}
+	clog<<tottim<<" seconds for annealing."<<endl;
 }
 
 
