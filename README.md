@@ -26,7 +26,15 @@ LE(legendary equipment): [numerical value of legendary equipment]
 
 ME(mythic equipment): [numerical value of mythic equipment]
   
-PK(perk): [numerical value of perks]
+PS(Power of Swiping): [numerical value of the Power of Swiping perk]
+
+AR(Adrenaline Rush): [numerical value of the Adrenaline Rush Perk]
+
+MR(Make it Rain): [numerical value of the Make it Rain Perk]
+
+MP(Mana Potion): [numerical value of the Mana Potion Perk]
+
+DO(Doom): [numerical value of the Doom Perk]
   
 FS(firestones): [numerical value of firestones]
 
@@ -63,5 +71,7 @@ SL means silver lock; quantities other than 1 are not supported
 GL means gold lock; quantities other than 1 are not supported
 
 After running the program, it will write the result in result.txt. An example of dungeon.txt and resourceValues.txt, as well as what result.txt should look like after running the program with the example dungeon.txt and resourceValues.txt files is given.
+
+In addition to writing the result into result.txt, it will also make intoSheet1.txt, and it might make intoSheet2.txt. intoSheet1.txt shows a file that you can use by making a copy of the "5.16 Dungeon Eggsplorer Event map" sheet(https://docs.google.com/spreadsheets/d/1hbrPgt0tHw-fJSjUZ6PY56TLY6uEIxX-lImWFQnKDos/edit#gid=0), going to one of the Opti sheets, delete everything from C14 to L342, paste the entire content of that file into a useless cell with lots of space below it(for this example I'll choose AY15), then in C14 put "=ARRAYFORMULA(IFERROR(SPLIT(AY15:AY, ";")))"(change AY15 and AY to something different you chose a different cell to paste the file into) and you'll see a nice visualisation of the path you should take. If it's optimal to buy some useless pets from the shop to get more torches, intoSheet2.txt will show you the best strategy if you want to do that; you use it in the same way as intoSheet1.txt.
 
 If you already spent some torches and want to optimize spending the rest, you can do that by setting the tiles that you opened in the dungeon as something like 1000 diamonds to force the optimizer to get them.
