@@ -1,4 +1,4 @@
-500 total torches
+300 total torches
 DI(diamonds): 1
 PL(pet levels; don't include the fact that they give torches into the value): 15
 SP(skill points): 100
@@ -12,6 +12,10 @@ RE(rare equipment): 5
 EE(event equipment): 1
 LE(legendary equipment): 25
 ME(mythic equipment): 100
-PK(perk): 0.01
-FS(firestones): 5
+PS(Power of Swiping): 0.01
+AR(Adrenaline Rush): 0.01
+MR(Make it Rain): 0.01
+MP(Mana Potion): 0.01
+DO(Doom): 0.01
+FS(firestones): 4
 FW(fortune hero weapon): 100
